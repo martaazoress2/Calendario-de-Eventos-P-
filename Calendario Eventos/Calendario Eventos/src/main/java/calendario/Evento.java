@@ -8,14 +8,19 @@ public class Evento {
     private String descripcion;
     private String categoria;
     private int recordatorioMinutos;
+    private boolean completado;
 
 
-    public Evento(String titulo, LocalDateTime fechaHora, String descripcion, String categoria, int RrcordatorioMinutos) {
+    public Evento(String titulo, LocalDateTime fechaHora, String descripcion, String categoria, int RrcordatorioMinutos, boolean completado) {
         this.titulo = titulo;
         this.fechaHora = fechaHora;
         this.descripcion = descripcion;
         this.categoria = categoria;
         this.recordatorioMinutos = recordatorioMinutos;
+        this.completado = false;
+    }
+
+    public Evento(String titulo, LocalDateTime fechaHora, String descripcion, String categoria, int recordatorioMinutos) {
     }
 
     public String getTitulo() {
@@ -65,6 +70,15 @@ public class Evento {
                 ", Descripción='" + descripcion + '\'' +
                 ", Categoría='" + categoria + '\'' +
                 ", Recordatorio=" + recordatorioMinutos + " minutos antes" +
+                ", Completado=" + (completado ? "Sí" : "No") +
                 '}';
+    }
+
+    public boolean isCompletado() {
+        return completado;
+    }
+
+    public void setCompletado(boolean completado) {
+        this.completado = completado;
     }
 }

@@ -1,0 +1,7 @@
+[
+{"titulo":"comida","fechaHora":"2025-01-20T15:00","descripcion":"comer","categoria":"Ocio","recordatorio":0,"completado":false},
+{"titulo":"Cenar (Recurrente 1)","fechaHora":"2025-01-05T21:00","descripcion":"Cenar","categoria":"Personal","recordatorio":0,"completado":false},
+{"titulo":"Cenar (Recurrente 2)","fechaHora":"2025-02-05T21:00","descripcion":"Cenar","categoria":"Personal","recordatorio":0,"completado":false},
+{"titulo":"Cenar (Recurrente 3)","fechaHora":"2025-03-05T21:00","descripcion":"Cenar","categoria":"Personal","recordatorio":0,"completado":false},
+{"titulo":"Cenar (Recurrente 4)","fechaHora":"2025-04-05T21:00","descripcion":"Cenar","categoria":"Personal","recordatorio":0,"completado":false}
+]

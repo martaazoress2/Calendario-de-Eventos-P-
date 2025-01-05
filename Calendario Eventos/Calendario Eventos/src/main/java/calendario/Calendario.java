@@ -6,7 +6,10 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 public class Calendario {
     private List<Evento> eventos;
@@ -139,7 +142,7 @@ public class Calendario {
                     }
 
                     // Crear el evento y agregarlo al calendario
-                    Evento evento = new Evento(titulo, fechaHora, descripcion, categoria, recordatorioMinutos);
+                    Evento evento = new Evento(titulo, fechaHora, descripcion, categoria, recordatorioMinutos, false);
                     calendario.agregarEvento(evento);
                 }
             }
@@ -147,5 +150,86 @@ public class Calendario {
         } catch (IOException e) {
             System.out.println("Error al importar los eventos: " + e.getMessage());
         }
+    }
+
+    //Filtrar evento por rango de fechas
+    public List<Evento> filtrarEventosPorRango(LocalDateTime inicio, LocalDateTime fin) {
+        return eventos.stream()
+                .filter(evento -> !evento.getFechaHora().isBefore(inicio) && !evento.getFechaHora().isAfter(fin))
+                .collect(Collectors.toList());
+    }
+
+    public void eliminarEventosPasados() {
+        LocalDateTime ahora = LocalDateTime.now();
+        int eventosEliminados = (int) eventos.stream()
+                .filter(evento -> evento.getFechaHora().isBefore(ahora))
+                .count();
+        eventos.removeIf(evento -> evento.getFechaHora().isBefore(ahora));
+        System.out.println(eventosEliminados + " evento(s) pasado(s) eliminado(s).");
+    }
+
+    public void exportarCalendarioCompleto(String nombreArchivoZip) {
+        if (eventos.isEmpty()) {
+            System.out.println("No hay eventos para exportar.");
+            return;
+        }
+
+        try (FileOutputStream fos = new FileOutputStream(nombreArchivoZip);
+             ZipOutputStream zos = new ZipOutputStream(fos)) {
+
+            // Crear archivo .txt
+            ZipEntry txtEntry = new ZipEntry("calendario.txt");
+            zos.putNextEntry(txtEntry);
+            StringBuilder txtContent = new StringBuilder();
+            for (Evento evento : eventos) {
+                txtContent.append(evento.toString()).append("\n");
+            }
+            zos.write(txtContent.toString().getBytes());
+            zos.closeEntry();
+
+            // Crear archivo .csv
+            ZipEntry csvEntry = new ZipEntry("calendario.csv");
+            zos.putNextEntry(csvEntry);
+            StringBuilder csvContent = new StringBuilder("Título,Fecha y Hora,Descripción,Categoría,Recordatorio,Completado\n");
+            for (Evento evento : eventos) {
+                csvContent.append(String.format("\"%s\",\"%s\",\"%s\",\"%s\",%d,%s\n",
+                        evento.getTitulo(),
+                        evento.getFechaHora(),
+                        evento.getDescripcion(),
+                        evento.getCategoria(),
+                        evento.getRecordatorioMinutos(),
+                        evento.isCompletado() ? "Sí" : "No"));
+            }
+            zos.write(csvContent.toString().getBytes());
+            zos.closeEntry();
+
+            // Crear archivo .json
+            ZipEntry jsonEntry = new ZipEntry("calendario.json");
+            zos.putNextEntry(jsonEntry);
+            StringBuilder jsonContent = new StringBuilder("[\n");
+            for (Evento evento : eventos) {
+                jsonContent.append(String.format("{\"titulo\":\"%s\",\"fechaHora\":\"%s\",\"descripcion\":\"%s\",\"categoria\":\"%s\",\"recordatorio\":%d,\"completado\":%s},\n",
+                        evento.getTitulo(),
+                        evento.getFechaHora(),
+                        evento.getDescripcion(),
+                        evento.getCategoria(),
+                        evento.getRecordatorioMinutos(),
+                        evento.isCompletado()));
+            }
+            // Eliminar la última coma y cerrar el JSON
+            if (jsonContent.length() > 2) {
+                jsonContent.setLength(jsonContent.length() - 2);
+            }
+            jsonContent.append("\n]");
+            zos.write(jsonContent.toString().getBytes());
+            zos.closeEntry();
+
+            System.out.println("Calendario exportado correctamente al archivo comprimido: " + nombreArchivoZip);
+
+        } catch (IOException e) {
+            System.out.println("Error al exportar el calendario: " + e.getMessage());
         }
     }
+
+
+}
