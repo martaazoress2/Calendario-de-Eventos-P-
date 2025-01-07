@@ -1,0 +1,5 @@
+Evento{Título='Examen Economía', Fecha y Hora=2025-01-15T11:30, Descripción='Examen final economía', Categoría='Trabajo', Recordatorio=0 minutos antes, Completado=Sí}
+Evento{Título='Examen Economía', Fecha y Hora=2025-04-20T12:00, Descripción='Examen final economía', Categoría='Trabajo', Recordatorio=0 minutos antes, Completado=No}
+Evento{Título='Comer (Recurrente 2)', Fecha y Hora=2025-02-04T15:00, Descripción='comer', Categoría='Personal', Recordatorio=0 minutos antes, Completado=No}
+Evento{Título='Comer (Recurrente 3)', Fecha y Hora=2025-03-04T15:00, Descripción='comer', Categoría='Personal', Recordatorio=0 minutos antes, Completado=No}
+Evento{Título='Comer (Recurrente 4)', Fecha y Hora=2025-04-04T15:00, Descripción='comer', Categoría='Personal', Recordatorio=0 minutos antes, Completado=No}

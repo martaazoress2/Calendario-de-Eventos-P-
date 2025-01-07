@@ -1,0 +1,7 @@
+[
+{"titulo":"Examen Economía","fechaHora":"2025-01-15T11:30","descripcion":"Examen final economía","categoria":"Trabajo","recordatorio":0,"completado":true},
+{"titulo":"Examen Economía","fechaHora":"2025-04-20T12:00","descripcion":"Examen final economía","categoria":"Trabajo","recordatorio":0,"completado":false},
+{"titulo":"Comer (Recurrente 2)","fechaHora":"2025-02-04T15:00","descripcion":"comer","categoria":"Personal","recordatorio":0,"completado":false},
+{"titulo":"Comer (Recurrente 3)","fechaHora":"2025-03-04T15:00","descripcion":"comer","categoria":"Personal","recordatorio":0,"completado":false},
+{"titulo":"Comer (Recurrente 4)","fechaHora":"2025-04-04T15:00","descripcion":"comer","categoria":"Personal","recordatorio":0,"completado":false}
+]

@@ -2,7 +2,7 @@ package calendario;
 
 import java.time.LocalDateTime;
 
-public class Evento {
+public class Evento implements Recordable{
     private String titulo;
     private LocalDateTime fechaHora;
     private String descripcion;
@@ -80,5 +80,10 @@ public class Evento {
 
     public void setCompletado(boolean completado) {
         this.completado = completado;
+    }
+
+    @Override
+    public void enviarRecordatorio() {
+        System.out.println("Recordatorio: El evento '" + titulo + "' está programado para " + fechaHora);
     }
 }

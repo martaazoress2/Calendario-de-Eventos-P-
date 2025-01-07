@@ -27,12 +27,60 @@ import static calendario.Calendario.importarEventos;
 
 public class Main{
     public static void main(String[] args){
+        SistemaUsuarios sistemaUsuarios = new SistemaUsuarios();
         Calendario calendario = new Calendario();
         Scanner scanner = new Scanner(System.in);
-        Preferencias preferencias = Preferencias.cargarPreferencias("preferencias.ser");
-        preferencias.guardarPreferencias(System.getProperty("user.home") + "/preferencias.ser");
+
+        // Registro inicial de un usuario
+        sistemaUsuarios.registrarUsuario("admin", "admin123");
+
+        Usuario usuarioActual = null;
+        Preferencias preferencias = new Preferencias();
 
         iniciarRecordatorios(calendario);
+
+        // Menú de autenticación
+        while (usuarioActual == null) {
+            System.out.println("\n=== Bienvenido al Sistema de Calendario ===");
+            System.out.println("1. Iniciar sesión");
+            System.out.println("2. Registrar nuevo usuario");
+            System.out.println("3. Salir");
+            System.out.print("Seleccione una opción: ");
+            int opcion = scanner.nextInt();
+            scanner.nextLine(); // Consumir el salto de línea
+
+            switch (opcion) {
+                case 1:
+                    System.out.print("Nombre de usuario: ");
+                    String nombre = scanner.nextLine();
+                    System.out.print("Contraseña: ");
+                    String contraseña = scanner.nextLine();
+                    usuarioActual = sistemaUsuarios.iniciarSesion(nombre, contraseña);
+                    if (usuarioActual == null) {
+                        System.out.println("Credenciales incorrectas. Intente nuevamente.");
+                    } else {
+                        System.out.println("Inicio de sesión exitoso. Bienvenido, " + usuarioActual.getNombre() + "!");
+                    }
+                    break;
+                case 2:
+                    System.out.print("Ingrese un nombre de usuario: ");
+                    String nuevoNombre = scanner.nextLine();
+                    System.out.print("Ingrese una contraseña: ");
+                    String nuevaContraseña = scanner.nextLine();
+                    if (sistemaUsuarios.registrarUsuario(nuevoNombre, nuevaContraseña)) {
+                        System.out.println("Usuario registrado exitosamente.");
+                    } else {
+                        System.out.println("El usuario ya existe. Intente con otro nombre.");
+                    }
+                    break;
+                case 3:
+                    System.out.println("Saliendo del sistema...");
+                    return;
+                default:
+                    System.out.println("Opción no válida.");
+            }
+        }
+
         int opcion;
 
         do {
@@ -40,26 +88,27 @@ public class Main{
             System.out.println("    CALENDARIO DE EVENTOS    ");
             System.out.println("\033[1;34m===========================\033[0m");
             System.out.println("1. Crear un evento");
-            System.out.println("2. Ver eventos");
-            System.out.println("3. Buscar un evento");
-            System.out.println("4. Eliminar un evento");
-            System.out.println("5. Editar evento");
-            System.out.println("6. Exportar eventos");
-            System.out.println("7. Importar eventos");
-            System.out.println("8. Duplicar evento");
-            System.out.println("9. Filtrar eventos por rango de fechas");
-            System.out.println("10. Ver estadísticas del calendario");
-            System.out.println("11. Marcar evento como completado");
+            System.out.println("2. Crear Evento Especial");
+            System.out.println("3. Editar evento");
+            System.out.println("4. Duplicar evento");
+            System.out.println("5. Crear evento recurrente");
+            System.out.println("6. Ver eventos");
+            System.out.println("7. Buscar un evento");
+            System.out.println("8. Marcar evento como completado");
+            System.out.println("9. Enviar recordatorios de eventos");
+            System.out.println("10. Filtrar eventos por rango de fechas");
+            System.out.println("11. Ver eventos completados");
             System.out.println("12. Ordenar eventos");
-            System.out.println("13. Crear evento recurrente");
-            System.out.println("14. Personalizar notificaciones");
+            System.out.println("13. Ver estadísticas del calendario");
+            System.out.println("14. Eliminar un evento");
             System.out.println("15. Eliminar eventos pasados");
-            System.out.println("16. Exportar calendario completo");
-            System.out.println("17. Mostrar ayuda");
-            System.out.println("18. Ver eventos completados");
-            System.out.println("10. Configurar preferencias");
-            System.out.println("7. Importar eventos");
-            System.out.println("20. Salir");
+            System.out.println("16. Personalizar notificaciones");
+            System.out.println("17. Importar eventos");
+            System.out.println("18. Exportar eventos");
+            System.out.println("19. Exportar calendario completo");
+            System.out.println("20. Configurar preferencias");
+            System.out.println("21. Mostrar ayuda");
+            System.out.println("22. Salir");
             System.out.println("\033[1;34m===========================\033[0m");
             //opcion = leerEntero(scanner, "Seleccione una opción: ");
             System.out.print("Seleccione una opción: ");
@@ -71,31 +120,39 @@ public class Main{
                     crearEvento(calendario, scanner);
                     break;
                 case 2:
-                    verEventos(calendario, scanner);
+                    crearEventoEspecial(calendario, scanner);
                     break;
                 case 3:
-                    buscarEvento(calendario, scanner);
-                    break;
-                case 4:
-                    eliminarEvento(calendario, scanner);
-                    break;
-                case 5:
                     editarEvento(calendario, scanner);
                     break;
-                case 6:
-                    System.out.println("Ingrese el nombre del archivo a exportar (ejemplo: eventos.csv): ");
-                    String nombreArchivo = scanner.nextLine();
-                    calendario.exportarEventos(nombreArchivo);
-                    break;
-                case 7:
-                    System.out.println("Ingrese el nombre del archivo a importar (ruta completa, ejemplo: /Users/tuUsuario/Desktop/eventos.txt): ");
-                    String nombreArchivoImportar = scanner.nextLine();
-                    Calendario.importarEventos(calendario, nombreArchivoImportar);
-                    break;
-                case 8:
+                case 4:
                     duplicarEvento(calendario, scanner);
                     break;
+                case 5:
+                    crearEventoRecurrente(calendario, scanner);
+                    break;
+                case 6:
+                    verEventos(calendario, scanner);
+                    break;
+                case 7:
+                    buscarEvento(calendario, scanner);
+                    break;
+                case 8:
+                    System.out.println("Ingrese el título del evento que desea marcar como completado: ");
+                    String tituloCompletado = scanner.nextLine();
+                    List<Evento> resultados = calendario.buscarEventoPorTitulo(tituloCompletado);
+                    if (resultados.isEmpty()) {
+                        System.out.println("No se encontró ningún evento con ese título.");
+                    } else {
+                        Evento evento = resultados.get(0); // Tomamos el primer resultado
+                        evento.setCompletado(true); // Marcamos el evento como completado
+                        System.out.println("El evento ha sido marcado como completado: " + evento);
+                    }
+                    break;
                 case 9:
+                    enviarRecordatorios(calendario);
+                    break;
+                case 10:
                     System.out.println("\n=== Filtrar eventos por rango de fechas ===");
                     LocalDateTime inicio = leerFechaHora(scanner, "Ingrese la fecha y hora de inicio (AAAA-MM-DDTHH:MM): ");
                     LocalDateTime fin = leerFechaHora(scanner, "Ingrese la fecha y hora de fin (AAAA-MM-DDTHH:MM): ");
@@ -117,40 +174,6 @@ public class Main{
                     }
                     break;
                 case 11:
-                    System.out.println("Ingrese el título del evento que desea marcar como completado: ");
-                    String tituloCompletado = scanner.nextLine();
-                    List<Evento> resultados = calendario.buscarEventoPorTitulo(tituloCompletado);
-                    if (resultados.isEmpty()) {
-                        System.out.println("No se encontró ningún evento con ese título.");
-                    } else {
-                        Evento evento = resultados.get(0); // Tomamos el primer resultado
-                        evento.setCompletado(true); // Marcamos el evento como completado
-                        System.out.println("El evento ha sido marcado como completado: " + evento);
-                    }
-                    break;
-                case 12:
-                    ordenarEventos(calendario, scanner);
-                    break;
-                case 13:
-                    crearEventoRecurrente(calendario, scanner);
-                    break;
-                case 14:
-                    personalizarNotificaciones(calendario, scanner);
-                    break;
-                case 15:
-                    System.out.println("\n=== Eliminar Eventos Pasados ===");
-                    calendario.eliminarEventosPasados();
-                    break;
-                case 16:
-                    System.out.println("\n=== Exportar Calendario Completo ===");
-                    System.out.print("Ingrese el nombre del archivo .zip (ejemplo: calendario.zip): ");
-                    String nombreArchivoZip = scanner.nextLine();
-                    calendario.exportarCalendarioCompleto(nombreArchivoZip);
-                    break;
-                case 17:
-                    mostrarAyuda();
-                    break;
-                case 18:
                     List<Evento> completados = calendario.getEventos().stream()
                             .filter(Evento::isCompletado)
                             .toList();
@@ -161,16 +184,51 @@ public class Main{
                         completados.forEach(System.out::println);
                     }
                     break;
+                case 12:
+                    ordenarEventos(calendario, scanner);
+                    break;
+                case 13:
+                    verEstadisticas(calendario);
+                    break;
+                case 14:
+                    eliminarEvento(calendario, scanner);
+                    break;
+                case 15:
+                    System.out.println("\n=== Eliminar Eventos Pasados ===");
+                    calendario.eliminarEventosPasados();
+                    break;
+                case 16:
+                    personalizarNotificaciones(calendario, scanner);
+                    break;
+                case 17:
+                    System.out.println("Ingrese el nombre del archivo a importar (ruta completa, ejemplo: /Users/tuUsuario/Desktop/eventos.txt): ");
+                    String nombreArchivoImportar = scanner.nextLine();
+                    Calendario.importarEventos(calendario, nombreArchivoImportar);
+                    break;
+                case 18:
+                    System.out.println("Ingrese el nombre del archivo a exportar (ejemplo: eventos.csv): ");
+                    String nombreArchivo = scanner.nextLine();
+                    calendario.exportarEventos(nombreArchivo);
+                    break;
                 case 19:
-                    configurarPreferencias(preferencias, scanner);
+                    System.out.println("\n=== Exportar Calendario Completo ===");
+                    System.out.print("Ingrese el nombre del archivo .zip (ejemplo: calendario.zip): ");
+                    String nombreArchivoZip = scanner.nextLine();
+                    calendario.exportarCalendarioCompleto(nombreArchivoZip);
                     break;
                 case 20:
+                    configurarPreferencias(preferencias, scanner);
+                    break;
+                case 21:
+                    mostrarAyuda();
+                    break;
+                case 22:
                     System.out.println("Saliendo del calendario...");
                     break;
                 default:
                     System.out.println("Opción NO válida");
             }
-        } while (opcion != 20);
+        } while (opcion != 22);
         scanner.close();
     }
 
@@ -197,7 +255,7 @@ public class Main{
     }
 
     private static void crearEvento(Calendario calendario, Scanner scanner) {
-        System.out.println("\nCREAR EVENTO");
+        System.out.println("\n=== Crear Evento ===");
         System.out.print("Título del evento: ");
         String titulo = scanner.nextLine();
 
@@ -220,6 +278,7 @@ public class Main{
     }
 
     private static void verEventos(Calendario calendario, Scanner scanner) {
+        System.out.println("\n=== Ver Eventos ===");
         System.out.println("\nSeleccione el tipo de vista: ");
         System.out.println("1. Vista diaria");
         System.out.println("2. Vista semanal");
@@ -265,6 +324,7 @@ public class Main{
          */
     }
     private static void mostrarEventos(List<Evento> eventos, String tituloVista) {
+        System.out.println("\n=== Mostrar Eventos ===");
         System.out.println("\n" + tituloVista);
         if (eventos.isEmpty()) {
             System.out.println("No hay eventos para esta vista");
@@ -287,6 +347,7 @@ public class Main{
     }
 
     private static void buscarEvento(Calendario calendario, Scanner scanner) {
+        System.out.println("\n=== Buscar Evento ===");
         System.out.println("Título del evento a buscar: ");
         String buscarTitulo = scanner.nextLine();
 
@@ -302,6 +363,7 @@ public class Main{
     }
 
     private static void eliminarEvento(Calendario calendario, Scanner scanner) {
+        System.out.println("\n=== Eliminar Evento ===");
         System.out.println("Ingrese el título del evento a eliminar: ");
         String eliminarTitulo = scanner.nextLine();
         boolean eliminado = calendario.eliminarEvento(eliminarTitulo);
@@ -314,6 +376,7 @@ public class Main{
 
 
     private static void editarEvento(Calendario calendario, Scanner scanner){
+        System.out.println("\n=== Editar Evento ===");
         System.out.println("Introduce el título del evento que desea editar: ");
         String titulo = scanner.nextLine();
 
@@ -363,6 +426,7 @@ public class Main{
     }
 
     private static void iniciarRecordatorios(Calendario calendario){
+        System.out.println("\n=== Iniciar un Recordatorio ===");
         ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
 
         executor.scheduleAtFixedRate(( ) -> {
@@ -627,6 +691,74 @@ public class Main{
         } catch (Exception e) {
             System.out.println("Error al guardar las preferencias: " + e.getMessage());
             e.printStackTrace(); // Mostrar detalles del error
+        }
+    }
+
+    private static void verEstadisticas(Calendario calendario) {
+        System.out.println("\n=== Estadísticas del Calendario ===");
+
+        // Número total de eventos
+        int totalEventos = calendario.getEventos().size();
+        System.out.println("Número total de eventos: " + totalEventos);
+
+        // Número de eventos completados
+        long eventosCompletados = calendario.getEventos().stream()
+                .filter(Evento::isCompletado)
+                .count();
+        System.out.println("Número de eventos completados: " + eventosCompletados);
+
+        // Categorías más usadas
+        System.out.println("\nCategorías más usadas:");
+        calendario.getEventos().stream()
+                .collect(Collectors.groupingBy(Evento::getCategoria, Collectors.counting()))
+                .entrySet().stream()
+                .sorted((e1, e2) -> Long.compare(e2.getValue(), e1.getValue())) // Ordenar de mayor a menor
+                .forEach(entry -> System.out.println(entry.getKey() + ": " + entry.getValue() + " eventos"));
+
+        // Si no hay eventos
+        if (totalEventos == 0) {
+            System.out.println("\nNo hay eventos en el calendario.");
+        }
+    }
+
+    private static void crearEventoEspecial(Calendario calendario, Scanner scanner) {
+        System.out.println("\n=== Crear Evento Especial1" +
+                " ===");
+        System.out.print("Título del evento: ");
+        String titulo = scanner.nextLine();
+
+        LocalDateTime fechaHora = leerFechaHora(scanner, "Fecha y Hora del evento (AAAA-MM-DDTHH:MM): ");
+
+        System.out.print("Descripción del evento: ");
+        String descripcion = scanner.nextLine();
+
+        System.out.print("Categoría del evento (Trabajo/Personal/Ocio): ");
+        String categoria = scanner.nextLine();
+
+        System.out.println("¿Cuántos minutos antes desea recibir un recordatorio del evento? (Ingrese 0 para desactivar opción): ");
+        int recordatorioMinutos = scanner.nextInt();
+        scanner.nextLine(); // Consumir salto de línea
+
+        System.out.print("Ubicación del evento: ");
+        String ubicacion = scanner.nextLine();
+
+        EventoEspecial eventoEspecial = new EventoEspecial(
+                titulo, fechaHora, descripcion, categoria, recordatorioMinutos, false, ubicacion
+        );
+
+        calendario.agregarEvento(eventoEspecial);
+
+        System.out.println("Evento especial creado correctamente: " + eventoEspecial);
+    }
+
+    private static void enviarRecordatorios(Calendario calendario) {
+        System.out.println("\n=== Enviar Recordatorios ===");
+        if (calendario.getEventos().isEmpty()) {
+            System.out.println("No hay eventos en el calendario.");
+        } else {
+            for (Evento evento : calendario.getEventos()) {
+                evento.enviarRecordatorio();
+            }
         }
     }
 
